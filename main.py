@@ -28,7 +28,7 @@ def parse_agrs():
     parser.add_argument('--image_dir_plip', type=str, default='plip/pt_files', help='the path to the directory containing the encoded wsi patches using PLIP.')
     parser.add_argument('--ann_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/tcga_brca_reports_splits.json', help='the path to the directory containing the data.')
     parser.add_argument('--split_path', type=str, default='../ocr/dataset_csv/splits_3.csv', help='the path to the directory containing the train/val/test splits.')
-    parser.add_argument('--bank_path', type=str, default='kb/knowledge_bank/memory_short.pt', help='the path to the directory containing the knowledge bank')
+    parser.add_argument('--bank_path', type=str, default='kb/brca/knowledge_bank/memory_short.pt', help='the path to the directory containing the knowledge bank')
 
     # Data loader settings
     parser.add_argument('--dataset_name', type=str, default='TCGA', choices=['TCGA','HistAI','REG'], help='the dataset to be used.')

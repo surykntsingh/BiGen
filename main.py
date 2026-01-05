@@ -24,14 +24,14 @@ def parse_agrs():
     parser = argparse.ArgumentParser()
 
     # Data input settings
-    parser.add_argument('--image_dir', type=str, default='.../pt_files', help='the path to the directory containing the encoded wsi patches using UNI.')
-    parser.add_argument('--image_dir_plip', type=str, default='.../pt_files', help='the path to the directory containing the encoded wsi patches using PLIP.')
-    parser.add_argument('--ann_path', type=str, default='.../TCGA_BRCA', help='the path to the directory containing the data.')
+    parser.add_argument('--image_dir', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed', help='the path to the directory containing the encoded wsi patches using UNI.')
+    parser.add_argument('--image_dir_plip', type=str, default='plip/pt_files', help='the path to the directory containing the encoded wsi patches using PLIP.')
+    parser.add_argument('--ann_path', type=str, default='/mnt/surya/dataset/TCGA_processed/brca_v2/tcga_brca_reports_splits.json', help='the path to the directory containing the data.')
     parser.add_argument('--split_path', type=str, default='../ocr/dataset_csv/splits_3.csv', help='the path to the directory containing the train/val/test splits.')
-    parser.add_argument('--bank_path', type=str, default='../memory_short.pt', help='the path to the directory containing the knowledge bank')
+    parser.add_argument('--bank_path', type=str, default='kb/knowledge_bank/memory_short.pt', help='the path to the directory containing the knowledge bank')
 
     # Data loader settings
-    parser.add_argument('--dataset_name', type=str, default='TCGA', choices=['TCGA',], help='the dataset to be used.')
+    parser.add_argument('--dataset_name', type=str, default='TCGA', choices=['TCGA','HistAI','REG'], help='the dataset to be used.')
     parser.add_argument('--max_fea_length', type=int, default=10000, help='the maximum sequence length of the patch embeddings.')
     parser.add_argument('--max_seq_length', type=int, default=600, help='the maximum sequence length of the reports.')
     parser.add_argument('--threshold', type=int, default=3, help='the cut off frequency for the words.')
@@ -111,14 +111,16 @@ def parse_agrs():
             vars(args)[arg] = False
     return args
 
-def setup(rank, world_size):
-    print(2)
-    os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = str(random.randint(30000, 40000))
+def setup(gpus):
+    # Let torchrun set these; fallback for safety/debug
+    os.environ['MASTER_ADDR'] = '127.0.0.1'  # Force loopback
+    os.environ['MASTER_PORT'] = '30001'  # Or any free port >1024master_port
+    os.environ['CUDA_VISIBLE_DEVICES'] = gpus
 
-    # initialize the process group
-    dist.init_process_group("nccl", rank=rank, world_size=world_size)
-    print(3)
+    dist.init_process_group(backend='nccl')
+
+
+
 def init_seeds(seed=0, cuda_deterministic=True):
     random.seed(seed)
     np.random.seed(seed)
@@ -130,19 +132,23 @@ def init_seeds(seed=0, cuda_deterministic=True):
     else:  # faster, less reproducible
         torch.backends.cudnn.deterministic = False
         torch.backends.cudnn.benchmark = True
-    
-def main(local_rank, world_size):
+
+
+
+def main():
 
 
     args = parse_agrs()
+    local_rank = int(os.environ['LOCAL_RANK'])
+    world_size = int(os.environ['WORLD_SIZE'])
+    rank = int(os.environ['RANK'])  # Optional, for logging
 
     # scaling learning rate
     args.lr_ed *= world_size
     
-    setup(local_rank, world_size)
+    setup(args.n_gpu)
+    torch.cuda.set_device(local_rank)
 
-    if not args.debug:
-        torch.cuda.set_device(local_rank)
 
     # fix random seeds
     init_seeds(args.seed+local_rank)
@@ -197,19 +203,11 @@ def main(local_rank, world_size):
 
 if __name__ == '__main__':
     args = parse_agrs()
-    
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.n_gpu
-
-    n_gpus = torch.cuda.device_count()
-    world_size = 1
-    
-    if args.debug:
-        assert n_gpus==1
-        main(0, 1)
+    if getattr(args, 'debug', False):
+        os.environ['LOCAL_RANK'] = '0'
+        os.environ['RANK'] = '0'
+        os.environ['WORLD_SIZE'] = '1'
+        main()
     else:
-
-        # main(1,1)
-        mp.spawn(main,
-                 args=(world_size,),
-                 nprocs=world_size,
-                 join=True)
+        # Let torchrun handle everything — just call main()
+        main()

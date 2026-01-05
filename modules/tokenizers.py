@@ -5,29 +5,43 @@ import os
 
 class Tokenizer(object):
     def __init__(self, args):
-        self.ann_path =args.ann_path 
+        self.ann_path = args.ann_path
         self.threshold = args.threshold
-        #self.dataset_name = args.dataset_name
-        self.dataset_name = 'BRCA'
-        if self.dataset_name == 'BRCA':
+        self.dataset_name = args.dataset_name
+        # self.dataset_name = 'BRCA'
+        if self.dataset_name == 'TCGA':
             self.clean_report = self.clean_report_brca
+        else:
+            self.clean_report = lambda x: x
 
-       
         self.token2idx, self.idx2token = self.create_vocabulary()
+
+    def read_json_file(self, json_path):
+        with open(json_path) as f:
+            d = json.load(f)
+        return d
 
     def create_vocabulary(self):
         total_tokens = []
-        root = self.ann_path
-        for dir in os.listdir(root):
-            file_name = os.path.join(root, dir, 'annotation')
-            #print(file_name)
-            with open(file_name, 'r') as f:
-                anno = f.read()
-                #print(repr(content))
-            #anno = json.loads(open(file_name, 'r').read())#改
-            tokens = self.clean_report(anno).split()
-            for token in tokens:
-                total_tokens.append(token)
+        reports = self.read_json_file(self.ann_path)
+        # print(f'reports: {reports}')
+        for split in reports:
+            # print(f'split: {split}, reports[split]: {reports[split]}')
+            for r in reports[split]:
+                # print(f' r:{r}')
+                tokens = self.clean_report(r['report']).split()
+                # print(f'tokens: {tokens}')
+                for token in tokens:
+                    total_tokens.append(token)
+
+        print(f'total_tokens: {len(total_tokens)}')
+        # for dir in os.listdir(root):
+        #     file_name = os.path.join(root, dir, 'annotation')
+        #
+        #     anno = json.loads(open(file_name, 'r').read())
+        #     tokens = self.clean_report(anno).split()
+        #     for token in tokens:
+        #         total_tokens.append(token)
 
         counter = Counter(total_tokens)
         vocab = [k for k, v in counter.items() if v >= self.threshold] + ['<unk>']

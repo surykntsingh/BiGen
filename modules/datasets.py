@@ -5,6 +5,8 @@ from PIL import Image
 from torch.utils.data import Dataset
 import pandas as pd
 import numpy as np
+import h5py
+
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, split, transform=None):
         self.image_dir = args.image_dir 
@@ -18,48 +20,60 @@ class BaseDataset(Dataset):
         self.tokenizer = tokenizer
         self.transform = transform
 
-        print("train:",len(pd.read_csv(self.split_path).loc[:, self.split].dropna()))
-        cases = self.clean_data(pd.read_csv(self.split_path).loc[:, self.split].dropna())
-        print("train:",len(cases))
+        # print("train:",len(pd.read_csv(self.split_path).loc[:, self.split].dropna()))
+        # cases = self.clean_data(pd.read_csv(self.split_path).loc[:, self.split].dropna())
+        # print("train:",len(cases))
 
-        
         self.examples = []
-        root = self.ann_path
+        reports = self.read_json_file(self.ann_path)[split]
 
-        count=0
-        s=[]
-        for dir in os.listdir(root):
-            if not dir in cases.keys(): # check whther contained in the split
-                
-                continue
-            else:
-                img_name = cases[dir]
-                
-            image_path = os.path.join(self.image_dir,img_name)
+        for r in reports:
+            img_name = r['id']
+            image_path = os.path.join(self.image_dir, f'{img_name}.h5')
 
-            if not os.path.exists(image_path+'.pt'):
-                print(image_path," not exists.")
+            if not os.path.isfile(image_path):
                 continue
-                
-            file_name = os.path.join(root, dir, 'annotation')
-            with open(file_name, 'r') as f:
-                anno = f.read()
-            s.append(file_name)
-          
+
+            # quickfix
+            if img_name == 'TCGA-A2-A1G0-01Z-00-DX1.9ECB0B8A-EF4E-45A9-82AC-EF36375DEF65':
+                continue
+
+            anno = r['report']
             report_ids = tokenizer(anno)
+
+            # for dir in os.listdir(root):
+            #     if not dir in cases.keys(): # check whther contained in the split
+            #         continue
+            #     else:
+            #         img_name = cases[dir]
+            #
+            #     image_path = os.path.join(self.image_dir,img_name)
+            #
+            #     if not os.path.exists(image_path+'.pt'):
+            #         continue
+            #
+            #     file_name = os.path.join(root, dir, 'annotation')
+            #
+            #     anno = json.loads(open(file_name, 'r').read())
+            #     report_ids = tokenizer(anno)
             if len(report_ids) < self.max_seq_length:
-                padding = [0] * (self.max_seq_length-len(report_ids))  
+                padding = [0] * (self.max_seq_length - len(report_ids))
                 report_ids.extend(padding)
-         
-            self.examples.append({'id':dir, 'image_path': image_path+'.pt','report': anno, 'split': self.split,'ids':report_ids, 'mask': [1]*len(report_ids)})
-
-
+            # report_ids = tokenizer(anno)[:self.max_seq_length]
+            self.examples.append(
+                {'id': img_name, 'image_path': image_path, 'report': anno, 'split': self.split, 'ids': report_ids,
+                 'mask': [1] * len(report_ids)})
 
         print(f'The size of {self.split} dataset: {len(self.examples)}')
 
 
     def __len__(self):
         return len(self.examples)
+
+    def read_json_file(self, json_path):
+        with open(json_path) as f:
+            d = json.load(f)
+        return d
 
 
 
@@ -68,12 +82,18 @@ class TcgaImageDataset(BaseDataset):
         example = self.examples[idx]
         image_id = example['id']
         image_path = example['image_path']
-        
-        image = torch.load(image_path)
+
+        # image = torch.load(image_path)
+        try:
+            with h5py.File(image_path, "r") as h5_file:
+                # coords_np = h5_file["coords"][:]
+                embeddings_np = h5_file["features"][:]
+
+                # coords = torch.tensor(coords_np).float()
+                image = torch.tensor(embeddings_np)
+        except Exception as e:
+            print(f'Problem with {image_path},\n {e}')
         image = image[:self.max_fea_length]
-        image_plip = torch.load(os.path.join(self.image_dir_plip,image_path.split('/')[-1]))[:self.max_fea_length]
-        image = torch.cat((image,image_plip),dim=1)
-        #print("image: ",image.shape)
         report_ids = example['ids']
         report_masks = example['mask']
 

@@ -60,8 +60,8 @@ if __name__=="__main__":
     texts = get_texts(json_path)
     print(f'num texts: {len(texts)}')
     text_embs =  get_text_embeddings(texts, model_cfg, checkpoint_path)
-    # save_text_embeddings(text_embs, save_path)
-    # save_sent_texts(texts, save_path)
+    save_text_embeddings(text_embs, save_path)
+    save_sent_texts(texts, save_path)
 
 
 

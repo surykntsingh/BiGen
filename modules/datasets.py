@@ -30,6 +30,7 @@ class BaseDataset(Dataset):
         for r in reports:
             img_name = r['id']
             image_path = os.path.join(self.image_dir, f'{img_name}.h5')
+            image_kb_path = os.path.join(self.image_dir_plip, f'{img_name}.h5')
 
             if not os.path.isfile(image_path):
                 continue
@@ -61,7 +62,7 @@ class BaseDataset(Dataset):
                 report_ids.extend(padding)
             # report_ids = tokenizer(anno)[:self.max_seq_length]
             self.examples.append(
-                {'id': img_name, 'image_path': image_path, 'report': anno, 'split': self.split, 'ids': report_ids,
+                {'id': img_name, 'image_path': image_path, 'image_kb_path':image_kb_path, 'report': anno, 'split': self.split, 'ids': report_ids,
                  'mask': [1] * len(report_ids)})
 
         print(f'The size of {self.split} dataset: {len(self.examples)}')
@@ -82,6 +83,7 @@ class TcgaImageDataset(BaseDataset):
         example = self.examples[idx]
         image_id = example['id']
         image_path = example['image_path']
+        image_kb_path = example['image_kb_path']
 
         # image = torch.load(image_path)
         try:
@@ -95,10 +97,22 @@ class TcgaImageDataset(BaseDataset):
             print(f'Problem with {image_path},\n {e}')
         image = image[:self.max_fea_length]
 
+        try:
+            with h5py.File(image_kb_path, "r") as h5_file:
+                # coords_np = h5_file["coords"][:]
+                embeddings_kb_np = h5_file["features"][:]
+
+                # coords = torch.tensor(coords_np).float()
+                image_kb = torch.tensor(embeddings_kb_np)
+        except Exception as e:
+            print(f'Problem with {image_path},\n {e}')
+        image = image[:self.max_fea_length]
+        image_kb = image_kb[:self.max_fea_length]
+
         # plip_path = f"{image_path.split('/')[-1][:12]}.pt"
         # image_plip = torch.load(os.path.join(self.image_dir_plip, plip_path))[:self.max_fea_length]
         # print(f'image: {image.shape}, image_plip: {image_plip.shape}')
-        # image = torch.cat((image, image_plip), dim=1)
+        image = torch.cat((image, image_kb), dim=1)
 
         report_ids = example['ids']
         report_masks = example['mask']

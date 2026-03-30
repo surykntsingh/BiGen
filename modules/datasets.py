@@ -95,7 +95,7 @@ class TcgaImageDataset(BaseDataset):
             print(f'Problem with {image_path},\n {e}')
         image = image[:self.max_fea_length]
 
-        plip_path = f'{image_path.split('/')[-1][:12]}.pt'
+        plip_path = f"{image_path.split('/')[-1][:12]}.pt"
         image_plip = torch.load(os.path.join(self.image_dir_plip, plip_path))[:self.max_fea_length]
         image = torch.cat((image, image_plip), dim=1)
 

@@ -21,14 +21,24 @@ def get_texts(json_path):
 
     return sentences
 
-def get_text_embeddings(texts, model_cfg, checkpoint_path, batch_size=16):
+def batch_list(iterable, n=1):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        yield iterable[ndx:min(ndx + n, l)]
+
+def get_text_embeddings(texts, model_cfg, checkpoint_path, batch_size=64):
     model, preprocess = create_model_from_pretrained(model_cfg, checkpoint_path)
     tokenizer = get_tokenizer()  # load tokenizer
+    all_embeddings = []
+    for batch in batch_list(texts, batch_size):
+        text_tokens = tokenize(texts=batch, tokenizer=tokenizer)  # tokenize the text
+        with torch.inference_mode():
+            text_embs = model.encode_text(text_tokens)
+            all_embeddings.append(text_embs.cpu())
 
-    text_tokens = tokenize(texts=texts[:batch_size], tokenizer=tokenizer)  # tokenize the text
-    text_embs = model.encode_text(text_tokens)
-    print(text_embs.shape)
-    return text_embs
+    final_embeddings = torch.cat(all_embeddings, dim=0)
+    print(final_embeddings.shape)
+    return final_embeddings
 
 def save_text_embeddings(text_embs, save_path):
     torch.save(text_embs, f'{save_path}/memory_short.pt')

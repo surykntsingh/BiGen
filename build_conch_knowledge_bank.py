@@ -41,9 +41,11 @@ def get_text_embeddings(texts, model_cfg, checkpoint_path, batch_size=64):
     return final_embeddings
 
 def save_text_embeddings(text_embs, save_path):
+    print(f'saving text embeddings at: {save_path}/memory_short.pt')
     torch.save(text_embs, f'{save_path}/memory_short.pt')
 
 def save_sent_texts(texts, save_path):
+    print(f'saving texts at: {save_path}/memory_short.pt')
     with open(f'{save_path}/short_texts.json', 'w') as f:
         json.dump(texts, f, indent=4)
 

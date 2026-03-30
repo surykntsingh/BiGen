@@ -21,10 +21,11 @@ def get_texts(json_path):
 
     return sentences
 
-def get_text_embeddings(texts, model_cfg, checkpoint_path):
+def get_text_embeddings(texts, model_cfg, checkpoint_path, batch_size=16):
     model, preprocess = create_model_from_pretrained(model_cfg, checkpoint_path)
     tokenizer = get_tokenizer()  # load tokenizer
-    text_tokens = tokenize(texts=texts, tokenizer=tokenizer)  # tokenize the text
+
+    text_tokens = tokenize(texts=texts[:batch_size], tokenizer=tokenizer)  # tokenize the text
     text_embs = model.encode_text(text_tokens)
     print(text_embs.shape)
     return text_embs
@@ -47,8 +48,8 @@ if __name__=="__main__":
     texts = get_texts(json_path)
     print(f'num texts: {len(texts)}')
     text_embs =  get_text_embeddings(texts, model_cfg, checkpoint_path)
-    save_text_embeddings(text_embs, save_path)
-    save_sent_texts(texts, save_path)
+    # save_text_embeddings(text_embs, save_path)
+    # save_sent_texts(texts, save_path)
 
 
 

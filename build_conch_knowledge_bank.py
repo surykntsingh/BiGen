@@ -1,3 +1,4 @@
+import os
 import json
 import spacy
 from conch.open_clip_custom import create_model_from_pretrained, get_tokenizer, tokenize
@@ -53,7 +54,7 @@ def save_sent_texts(texts, save_path):
 if __name__=="__main__":
     json_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/tcga_brca_reports_splits.json'
     save_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/conch'
-
+    os.makedirs(save_path, exist_ok=True)
     model_cfg = 'conch_ViT-B-16'
     checkpoint_path = '../../CONCH/checkpoints/conch/pytorch_model.bin'
 

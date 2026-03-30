@@ -161,9 +161,9 @@ def main():
     
     val_dataloader = R2DataLoader(args, tokenizer, split='val', shuffle=False)
     test_dataloader = R2DataLoader(args, tokenizer, split='test', shuffle=False)
-    print("train_dataloader:",train_dataloader)
-    print("val_dataloader:",val_dataloader)
-    print("test_dataloader:",test_dataloader)
+    print("train_dataloader:",len(train_dataloader))
+    print("val_dataloader:",len(val_dataloader))
+    print("test_dataloader:",len(test_dataloader))
     # build model architecture
     model = R2GenModel(args, tokenizer).to(local_rank)
     

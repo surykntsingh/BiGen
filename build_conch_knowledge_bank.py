@@ -11,7 +11,7 @@ def read_json_file(json_path):
 
 def get_texts(json_path):
     reports =  read_json_file(json_path)
-    text_list = [r['report']['train'] for r in reports]
+    text_list = [r['report'] for r in reports['train']]
 
     nlp = spacy.load("en_core_web_sm")
     sentences = []
@@ -45,6 +45,7 @@ if __name__=="__main__":
     checkpoint_path = '../../CONCH/checkpoints/conch/pytorch_model.bin'
 
     texts = get_texts(json_path)
+    print(f'num texts: {len(texts)}')
     text_embs =  get_text_embeddings(texts, model_cfg, checkpoint_path)
     save_text_embeddings(text_embs, save_path)
     save_sent_texts(texts, save_path)

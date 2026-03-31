@@ -53,8 +53,8 @@ class R2GenModel(nn.Module):
     def forward_brca(self, images, targets=None, mode='train'):
 
         # att_feats = self.wsi_mapping(images)  # shape 1*N*384
-    
-        # att_feats = torch.cat([self.prompt,att_feats],dim=1)
+        att_feats = images  # shape 1*N*384
+        att_feats = torch.cat([self.prompt,att_feats],dim=1)
         att_feats = torch.cat([torch.cat((self.prompt,self.prompt_plip),dim=2),att_feats],dim=1)
 
         fc_feats = torch.sum(att_feats[:,:,:-512],dim=1) #shape 1*384

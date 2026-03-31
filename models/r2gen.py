@@ -13,7 +13,7 @@ class R2GenModel(nn.Module):
         self.tokenizer = tokenizer
         self.prompt = nn.Parameter(torch.randn(1, 1, args.d_vf))
         self.prompt_plip = nn.Parameter(torch.randn(1, 1, 512))
-        # self.wsi_mapping = torch.nn.Linear(768, self.args.d_vf+512)
+        self.wsi_mapping = torch.nn.Linear(768+512, self.args.d_vf+512)
         self.fc = nn.Sequential(nn.LayerNorm(args.d_model),nn.Linear(args.d_model,args.d_model),nn.Linear(args.d_model,args.n_classes))
         if not encoder_decoder:
             print('use encoder_decoder: default')
@@ -52,8 +52,8 @@ class R2GenModel(nn.Module):
 
     def forward_brca(self, images, targets=None, mode='train'):
 
-        # att_feats = self.wsi_mapping(images)  # shape 1*N*384
-        att_feats = images  # shape 1*N*384
+        att_feats = self.wsi_mapping(images)  # shape 1*N*384
+        # att_feats = images  # shape 1*N*384
         # att_feats = torch.cat([self.prompt,att_feats],dim=1)
         att_feats = torch.cat([torch.cat((self.prompt,self.prompt_plip),dim=2),att_feats],dim=1)
 

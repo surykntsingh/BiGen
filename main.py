@@ -176,7 +176,7 @@ def main():
     print("val_dataloader:",len(val_dataloader))
     print("test_dataloader:",len(test_dataloader))
     # build model architecture
-    model = R2GenModel(args, tokenizer).to(local_rank)
+    model = R2GenModel(args, tokenizer)#.to(local_rank)
     
     if args.mode == 'Test':
         resume_path = os.path.join(args.checkpoint_dir, 'model_best.pth')

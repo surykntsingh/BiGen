@@ -41,7 +41,7 @@ def parse_agrs():
     parser.add_argument('--split_path', type=str, default='../ocr/dataset_csv/splits_3.csv', help='the path to the directory containing the train/val/test splits.')
     # parser.add_argument('--bank_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/conch/kb/memory_short.pt', help='the path to the directory containing the knowledge bank')
 
-    parser.add_argument('--bank_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasetsTCGA_processed/conch/memory_short.pt', help='the path to the directory containing the knowledge bank')
+    parser.add_argument('--bank_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/conch/memory_short.pt', help='the path to the directory containing the knowledge bank')
 
     # Data loader settings
     parser.add_argument('--dataset_name', type=str, default='TCGA', choices=['TCGA','HistAI','REG'], help='the dataset to be used.')

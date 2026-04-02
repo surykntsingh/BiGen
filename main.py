@@ -24,8 +24,8 @@ def parse_agrs():
     parser = argparse.ArgumentParser()
 
     # Data input settings
-    parser.add_argument('--image_dir', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overla/features_conch_v15', help='the path to the directory containing the encoded wsi patches using UNI.')
-    parser.add_argument('--image_dir_plip', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overla/features_conch_v1', help='the path to the directory containing the encoded wsi patches using PLIP.')
+    parser.add_argument('--image_dir', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overlap/features_conch_v15', help='the path to the directory containing the encoded wsi patches using UNI.')
+    parser.add_argument('--image_dir_plip', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overlap/features_conch_v1', help='the path to the directory containing the encoded wsi patches using PLIP.')
     parser.add_argument('--ann_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/reg_reports_splits.json', help='the path to the directory containing the data.')
 
     # parser.add_argument('--image_dir', type=str,

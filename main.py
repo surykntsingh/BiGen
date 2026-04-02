@@ -176,8 +176,9 @@ def main():
     print("val_dataloader:",len(val_dataloader))
     print("test_dataloader:",len(test_dataloader))
     # build model architecture
-    model = R2GenModel(args, tokenizer)#.to(local_rank)
-    
+    model = R2GenModel(args, tokenizer).to(local_rank)
+
+
     if args.mode == 'Test':
         resume_path = os.path.join(args.checkpoint_dir, 'model_best.pth')
         print("Loading checkpoint: {} ...".format(resume_path))
@@ -187,7 +188,7 @@ def main():
         model_dict.update(state_dict)
         model.load_state_dict(model_dict)
 
-
+    print(f"Rank {local_rank} has {sum(p.numel() for p in model.parameters())} parameters")
     model = DDP(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
     
     # build optimizer, learning rate scheduler. set after DDP.

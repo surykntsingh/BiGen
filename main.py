@@ -24,11 +24,22 @@ def parse_agrs():
     parser = argparse.ArgumentParser()
 
     # Data input settings
-    parser.add_argument('--image_dir', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/features_conch_v15', help='the path to the directory containing the encoded wsi patches using UNI.')
-    parser.add_argument('--image_dir_plip', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/features_conch_v1', help='the path to the directory containing the encoded wsi patches using PLIP.')
-    parser.add_argument('--ann_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/tcga_brca_reports_splits.json', help='the path to the directory containing the data.')
+    parser.add_argument('--image_dir', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overla/features_conch_v15', help='the path to the directory containing the encoded wsi patches using UNI.')
+    parser.add_argument('--image_dir_plip', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/train/20x_512px_0px_overla/features_conch_v1', help='the path to the directory containing the encoded wsi patches using PLIP.')
+    parser.add_argument('--ann_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/reg_reports_splits.json', help='the path to the directory containing the data.')
+
+    parser.add_argument('--image_dir', type=str,
+                        default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/features_conch_v15',
+                        help='the path to the directory containing the encoded wsi patches using UNI.')
+    parser.add_argument('--image_dir_plip', type=str,
+                        default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/features_conch_v1',
+                        help='the path to the directory containing the encoded wsi patches using PLIP.')
+    parser.add_argument('--ann_path', type=str,
+                        default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/brca_v2/tcga_brca_reports_splits.json',
+                        help='the path to the directory containing the data.')
+
     parser.add_argument('--split_path', type=str, default='../ocr/dataset_csv/splits_3.csv', help='the path to the directory containing the train/val/test splits.')
-    parser.add_argument('--bank_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/TCGA_processed/conch/memory_short.pt', help='the path to the directory containing the knowledge bank')
+    parser.add_argument('--bank_path', type=str, default='/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/conch/kb/memory_short.pt', help='the path to the directory containing the knowledge bank')
 
     # Data loader settings
     parser.add_argument('--dataset_name', type=str, default='TCGA', choices=['TCGA','HistAI','REG'], help='the dataset to be used.')

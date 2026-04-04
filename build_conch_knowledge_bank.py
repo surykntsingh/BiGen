@@ -52,8 +52,8 @@ def save_sent_texts(texts, save_path):
 
 
 if __name__=="__main__":
-    json_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/reg_reports_splits.json'
-    save_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/REG_2025/conch/kb'
+    json_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/histai_processed/curated/histai_reports_splits.json'
+    save_path = '/lustre/nvwulf/projects/PrasannaGroup-nvwulf/surya/datasets/histai_processed/curated/conch/kb'
     os.makedirs(save_path, exist_ok=True)
     model_cfg = 'conch_ViT-B-16'
     checkpoint_path = '../../CONCH/checkpoints/conch/pytorch_model.bin'

@@ -93,7 +93,7 @@ def parse_agrs():
 
     # Trainer settings
     parser.add_argument('--n_gpu', type=str, default='0', help='the  gpus to be used.')
-    parser.add_argument('--epochs', type=int, default=60, help='the number of training epochs.')
+    parser.add_argument('--epochs', type=int, default=100, help='the number of training epochs.')
     parser.add_argument('--epochs_val', type=int, default=2, help='interval between eval epochs')
     parser.add_argument('--start_val', type=int, default=0, help='start eval epochs')
     parser.add_argument('--save_dir', type=str, default='results/HistAI/1/', help='the patch to save the models.')
@@ -115,7 +115,7 @@ def parse_agrs():
     parser.add_argument('--gamma', type=float, default=0.1, help='the gamma of the learning rate scheduler.')
     
     # debug
-    parser.add_argument("--checkpoint_dir", type=str, default='results/BRCA/')
+    parser.add_argument("--checkpoint_dir", type=str, default='results/HistAI/1/')
     parser.add_argument("--mode", type=str, default='Test')
     parser.add_argument("--debug", type=str, default='False')
     parser.add_argument("--local_rank", type=int, default=-1)
